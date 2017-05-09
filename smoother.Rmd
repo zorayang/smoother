@@ -24,29 +24,29 @@ plot(data_w[,1], data_w[,2], xlab = "x", ylab = "y",
 ```{r}
 #approximate sin(x) with nth degree polynomials
 sq_s <- data_s[,1]
-p_pred_s <- poly_approx(data_s[,1], data_s[,2], sq, n = 5)
+p_pred_s <- poly_approx(data_s[,1], data_s[,2], sq_s, n = 5)
 plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
      main = "5th degree polynomial approximation of Sin(x) on [0,1]")
 points(sq_s, p_pred_s, pch = 20, col = "hotpink")
-s_y <- test_function(sq, type = "Sine")
+s_y <- test_function(sq_s, type = "Sine")
 lines(sq_s, s_y, col = "slateblue")
 ```
 
 ```{r}
 #approximate Weierstrass(x) with nth degree polynomials
 sq_w <- data_w[,1]
-p_pred_w <- poly_approx(data_w[,1], data_w[,2], sq, n = 10)
+p_pred_w <- poly_approx(data_w[,1], data_w[,2], sq_w, n = 10)
 plot(data_w[,1], data_w[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
      main = "5th degree poly. approx. of Weierstrass function on [0,1]")
 points(sq_w, p_pred_w, pch = 20, col = "hotpink")
-w_y <- test_function(sq, type = "W")
+w_y <- test_function(sq_w, type = "W")
 lines(sq_w, w_y, col = "slateblue")
 ```
 
 ####natural splines
 ```{r}
 #Sine
-sp_pred_s <- natural_spline(data_s[,1], data_s[,2], sq, k = 5)
+sp_pred_s <- natural_spline(data_s[,1], data_s[,2], sq_s, k = 5)
 plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
      main = "5th degree natural spline approximation of Sin(x) on [0,1]")
 points(sq_s, sp_pred_s, pch = 20, col = "hotpink")
@@ -55,7 +55,7 @@ lines(sq_s, s_y, col = "slateblue")
 
 ```{r}
 #Weierstrass
-sp_pred_s <- natural_spline(data_s[,1], data_s[,2], sq, k = 5)
+sp_pred_s <- natural_spline(data_s[,1], data_s[,2], sq_w, k = 5)
 plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
      main = "Mth degree spline approximation of Weierstrass function on [0,1]")
 points(sq_w, sp_pred_s, pch = 20, col = "hotpink")
