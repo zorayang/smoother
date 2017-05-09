@@ -43,7 +43,7 @@ poly_approx = function(x, y, sq, n){
 }
 
 #https://faculty.washington.edu/heagerty/Courses/b571/homework/spline-tutorial.q
-natural_spline = function(x, y, sq, k){
+natural_spline = function(x, y, sq, k, l){
   #select evenly spaced knots
   K <- seq(min(x), max(x), length.out = (k+2))[2:(k+1)]
   
@@ -52,12 +52,12 @@ natural_spline = function(x, y, sq, k){
   for (m in 1:length(x)){
     row <- length(K)
     for (n in 1:length(K)){
-      row[n] <- ((x[m]-K[n])^max(0,x[m]-K[n]))^3
+      row[n] <- (max(0,x[m]-K[n]))^l
     }
     A[m,] <- row
   }
   
-  X <- cbind(poly(x, 3, raw = T), A)
+  X <- cbind(poly(x, l, raw = T), A)
   w_hat <- coef(lm(y~X))
-  pred <- cbind(rep(1, length(sq)), cbind(poly(sq, 3, raw = T), A)) %*% w_hat 
+  pred <- cbind(rep(1, length(sq)), cbind(poly(sq, l, raw = T), A)) %*% w_hat 
 }
