@@ -46,8 +46,9 @@ natural_spline = function(x, y, sq, k, l){
   K <- seq(min(x), max(x), length.out = (k+2))[2:(k+1)]
   A <- matrix(, length(x), length(K))
   for (m in 1:length(x)){
+    row <- vector(length = length(K))
     for (n in 1:length(K)){
-      row[n] <- (max(0,x[m]-K[n]))^l
+      row[n] = (max(0,x[m]-K[n]))^l
     }
     A[m,] <- row
   }
@@ -57,7 +58,7 @@ natural_spline = function(x, y, sq, k, l){
   pred <- cbind(rep(1, length(sq)), cbind(poly(sq, l, raw = T), A)) %*% w_hat 
 }
 
-kernel_function = function(t, kernel = "Epanechnikov"){
+kernel_function = function(t, kernel){
   if(abs(t)>1){
     return(0)
   }else{
@@ -71,14 +72,15 @@ kernel_function = function(t, kernel = "Epanechnikov"){
   }
 }
 
-Nadaraya_Watson = function(x, y, sq, lambda=0.2){
+Nadaraya_Watson = function(x, y, sq, lambda=0.2, kernel = "Epanechnikov"){
   f <- function(sqs){
+    y_hat <- vector(length = length(x))
     for(i in 1:length(sqs)){
       numerator = 0
       denominator = 0
       for (j in 1:length(x)){
         tj <- abs(x[j]-sq[i])/lambda
-        kj <- kernel_function(tj)
+        kj <- kernel_function(tj, "Epanechnikov")
         kyj <- kj * y[j]
         numerator = numerator + kyj
         denominator = denominator + kj
