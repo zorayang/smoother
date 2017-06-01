@@ -6,6 +6,7 @@ output: html_document
 ---
 ```{r, echo=F}
 source('smoother.R')
+library(ggplot2)
 ```
 
 ####Polynomial basis
@@ -17,7 +18,7 @@ plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y",
 sq_s <- data_s[,1]
 
 #Weierstrass function
-data_w <- data.gen(a = 0, b = 1, "W")
+data_w <- data.gen(a = 0, b = 1, len = 200, "W")
 plot(data_w[,1], data_w[,2], xlab = "x", ylab = "y", 
      pch=20, cex =.7, main = "Noisy Weierstrass function on [0,1]")
 sq_w <- data_w[,1]
@@ -64,18 +65,40 @@ lines(sq_w, w_y, col = "slateblue")
 
 ####Nadaraya-Watson
 ```{r}
-#Sine
 nw_pred_s <- Nadaraya_Watson(data_s[,1], data_s[,2], sq_s, lambda = 0.1)
 plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
-     main = "5th degree natural spline approximation of Sin(x) on [0,1]")
+     main = "Nadaraya-Watson smoothing of Sin(x) on [0,1]")
 points(sq_s, nw_pred_s, pch = 20, col = "hotpink")
 lines(sq_s, s_y, col = "slateblue")
 ```
 
 ```{r}
-nw_pred_w <- Nadaraya_Watson(data_w[,1], data_w[,2], sq_w, lambda = 0.05)
+nw_pred_w <- Nadaraya_Watson(data_w[,1], data_w[,2], sq_w, lambda = 0.15, kernel = "Tricube")
 plot(data_w[,1], data_w[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
      main = "Nadaraya-Watson smoothing of the Weierstrass function")
 points(sq_w, nw_pred_w, pch = 20, col = "hotpink")
 lines(sq_w, w_y, col = "slateblue")
 ```
+
+####LOESS
+```{r}
+loess_pred_s <- lo_ess(data_s[,1], data_s[,2], sq_s, lambda = 0.2)
+plot(data_s[,1], data_s[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
+     main = "Loess of of Sin(x) on [0,1]")
+points(sq_s, loess_pred_s, pch = 20, col = "hotpink")
+lines(sq_s, s_y, col = "slateblue")
+```
+
+```{r}
+loess_pred_w <- lo_ess(data_w[,1], data_w[,2], sq_w, lambda = 0.2, kernel = "Tricube", d = 2)
+plot(data_w[,1], data_w[,2], xlab = "x", ylab = "y", pch = 20, cex = .5, 
+     main = "Loess of the Weierstrass function on [0,1]")
+lines(sq_w, loess_pred_w, col = "hotpink")
+lines(sq_w, w_y, col = "slateblue")
+
+native_loess <- loess(data_w[,2] ~ data_w[,1], data=data.frame(data_w), span=0.20)
+smoothed <- predict(native_loess) 
+lines(sq_w, smoothed, col = "forestgreen")
+```
+
+

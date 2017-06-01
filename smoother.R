@@ -52,7 +52,6 @@ natural_spline = function(x, y, sq, k, l){
     }
     A[m,] <- row
   }
-  
   X <- cbind(poly(x, l, raw = T), A)
   w_hat <- coef(lm(y~X))
   pred <- cbind(rep(1, length(sq)), cbind(poly(sq, l, raw = T), A)) %*% w_hat 
@@ -66,21 +65,21 @@ kernel_function = function(t, kernel){
            Uniform = {return(1/2)},
            Triangular = {return(1-abs(t))},
            Epanechnikov = {return(3/4*(1-t^2))},
-           Tricube = {return(70/81*(1-abs(t)^3)^3)},
+           Tricube = {return((1-abs(t)^3)^3)},
            Gaussian = {return(1/sqrt(2*pi)*exp(-1/2*t^2))}
            )
   }
 }
 
 Nadaraya_Watson = function(x, y, sq, lambda=0.2, kernel = "Epanechnikov"){
-  f <- function(sqs){
-    y_hat <- vector(length = length(x))
+  f = function(sqs){
+    y_hat <- vector(length = length(sqs))
     for(i in 1:length(sqs)){
       numerator = 0
       denominator = 0
       for (j in 1:length(x)){
         tj <- abs(x[j]-sq[i])/lambda
-        kj <- kernel_function(tj, "Epanechnikov")
+        kj <- kernel_function(tj, kernel)
         kyj <- kj * y[j]
         numerator = numerator + kyj
         denominator = denominator + kj
@@ -96,3 +95,24 @@ Nadaraya_Watson = function(x, y, sq, lambda=0.2, kernel = "Epanechnikov"){
   return(f(sq))
 }
 
+lo_ess = function(x, y, sq, d = 2, lambda = 0.2, kernel = "Tricube"){
+  f = function(sqs){
+    if (d==0){
+      return(Nadaraya_Watson(x, y, sq, lambda, kernel))
+    }
+    y_hat <- vector(length = length(sqs))
+    for(i in 1:length(sqs)){
+      W <- vector(length = length(x))
+      for(j in 1:length(x)){
+        tj <- abs(x[j]-sq[i])/lambda
+        kj <- kernel_function(tj, kernel)
+        W[j] <- kj
+      }
+      bi_hat <- coef(lm(y~poly(x,d,raw = T), weights = W))
+      yi_hat <- cbind(1, poly(sqs[i], d, raw = T)) %*% bi_hat
+      y_hat[i] <- yi_hat
+    }
+    return(y_hat)
+  }
+  return(f(sq))
+}
